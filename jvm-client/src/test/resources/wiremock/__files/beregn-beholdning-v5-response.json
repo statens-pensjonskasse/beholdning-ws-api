@@ -1,0 +1,477 @@
+{
+  "produkt": "Påslagspensjon",
+  "beholdningsendringer": [
+    {
+      "dato": "2031-08-01",
+      "type": "Tilførsel",
+      "pensjon": {
+        "beholdning": 0,
+        "endring": 0,
+        "ordninger": null
+      },
+      "rest": {
+        "beholdning": 4439,
+        "endring": 4439,
+        "ordninger": null
+      },
+      "meta": {
+        "uttak": null,
+        "tilførsel": {
+          "ordningsnummer": "3010",
+          "kilde": "Stilling",
+          "stilling": {
+            "forholdsnummer": "7410712",
+            "avtalenummer": "204396",
+            "stillingsprosent": 80.0,
+            "lønn": 726605,
+            "sats": 3.5
+          },
+          "uføre": null,
+          "aord": null
+        }
+      }
+    },
+    {
+      "dato": "2033-06-01",
+      "type": "Tilførsel",
+      "pensjon": {
+        "beholdning": 0,
+        "endring": 0,
+        "ordninger": null
+      },
+      "rest": {
+        "beholdning": 4764,
+        "endring": 325,
+        "ordninger": null
+      },
+      "meta": {
+        "uttak": null,
+        "tilførsel": {
+          "ordningsnummer": "3200",
+          "kilde": "Aord",
+          "stilling": null,
+          "uføre": null,
+          "aord": {
+            "refusjonsnummer": "791"
+          }
+        }
+      }
+    },
+    {
+      "dato": "2035-07-01",
+      "type": "Tilførsel",
+      "pensjon": {
+        "beholdning": 0,
+        "endring": 0,
+        "ordninger": null
+      },
+      "rest": {
+        "beholdning": 5651,
+        "endring": 887,
+        "ordninger": null
+      },
+      "meta": {
+        "uttak": null,
+        "tilførsel": {
+          "ordningsnummer": "3010",
+          "kilde": "Uføre",
+          "stilling": null,
+          "uføre": {
+            "avtalenummer": "204396",
+            "uføregrad": 20,
+            "pensjonsgrunnlag": 155678,
+            "sats": 3.5
+          },
+          "aord": null
+        }
+      }
+    },
+    {
+      "dato": "2037-07-01",
+      "type": "Tilførsel",
+      "pensjon": {
+        "beholdning": 0,
+        "endring": 0,
+        "ordninger": null
+      },
+      "rest": {
+        "beholdning": 19642,
+        "endring": 13991,
+        "ordninger": null
+      },
+      "meta": {
+        "uttak": null,
+        "tilførsel": {
+          "ordningsnummer": "4083",
+          "kilde": "Uspesifisert",
+          "stilling": null,
+          "uføre": null,
+          "aord": null
+        }
+      }
+    },
+    {
+      "dato": "2037-07-01",
+      "type": "Tilbakeføring",
+      "pensjon": {
+        "beholdning": 0,
+        "endring": 0,
+        "ordninger": null
+      },
+      "rest": {
+        "beholdning": 19642,
+        "endring": 0,
+        "ordninger": null
+      },
+      "meta": null
+    },
+    {
+      "dato": "2037-07-01",
+      "type": "Gradsendring",
+      "pensjon": {
+        "beholdning": 9821,
+        "endring": 9821,
+        "ordninger": null
+      },
+      "rest": {
+        "beholdning": 9821,
+        "endring": -9821,
+        "ordninger": null
+      },
+      "meta": {
+        "uttak": {
+          "uttaksgrad": 50,
+          "delingstall": 13.92
+        },
+        "tilførsel": null
+      }
+    },
+    {
+      "dato": "2038-09-01",
+      "type": "Tilførsel",
+      "pensjon": {
+        "beholdning": 9821,
+        "endring": 0,
+        "ordninger": null
+      },
+      "rest": {
+        "beholdning": 14260,
+        "endring": 4439,
+        "ordninger": null
+      },
+      "meta": {
+        "uttak": null,
+        "tilførsel": {
+          "ordningsnummer": "3045",
+          "kilde": "Uføre",
+          "stilling": null,
+          "uføre": {
+            "avtalenummer": "204396",
+            "uføregrad": 100,
+            "pensjonsgrunnlag": 155678,
+            "sats": 3.5
+          },
+          "aord": null
+        }
+      }
+    },
+    {
+      "dato": "2039-05-01",
+      "type": "Regulering",
+      "pensjon": {
+        "beholdning": 10086,
+        "endring": 265,
+        "ordninger": null
+      },
+      "rest": {
+        "beholdning": 14630,
+        "endring": 370,
+        "ordninger": null
+      },
+      "meta": null
+    },
+    {
+      "dato": "2039-12-01",
+      "type": "Tilførsel",
+      "pensjon": {
+        "beholdning": 10086,
+        "endring": 0,
+        "ordninger": null
+      },
+      "rest": {
+        "beholdning": 21517,
+        "endring": 6887,
+        "ordninger": null
+      },
+      "meta": {
+        "uttak": null,
+        "tilførsel": {
+          "ordningsnummer": "3045",
+          "kilde": "Stilling",
+          "stilling": {
+            "forholdsnummer": "4480910",
+            "avtalenummer": "204396",
+            "stillingsprosent": 80.0,
+            "lønn": 726605,
+            "sats": 3.5
+          },
+          "uføre": null,
+          "aord": null
+        }
+      }
+    },
+    {
+      "dato": "2040-01-01",
+      "type": "Tilbakeføring",
+      "pensjon": {
+        "beholdning": 0,
+        "endring": -10086,
+        "ordninger": null
+      },
+      "rest": {
+        "beholdning": 30175,
+        "endring": 8658,
+        "ordninger": null
+      },
+      "meta": null
+    },
+    {
+      "dato": "2040-01-01",
+      "type": "Tilvekst",
+      "pensjon": {
+        "beholdning": 30175,
+        "endring": 30175,
+        "ordninger": [
+          {
+            "ordningsnummer": "3010",
+            "beholdning": 60000,
+            "endring": 5000,
+            "stilling": {
+              "beholdning": 52000,
+              "endring": 5000,
+              "avtaler": [
+                {
+                  "avtalenummer": "204396",
+                  "beholdning": 38000,
+                  "endring": 5000
+                },
+                {
+                  "avtalenummer": "203712",
+                  "beholdning": 14000,
+                  "endring": 0
+                }
+              ]
+            },
+            "uføre": {
+              "beholdning": 8000,
+              "endring": 0,
+              "avtaler": [
+                {
+                  "avtalenummer": "204396",
+                  "beholdning": 8000,
+                  "endring": 0
+                }
+              ]
+            },
+            "aord": null,
+            "uspesifisert": null
+          },
+          {
+            "ordningsnummer": "3045",
+            "beholdning": 32000,
+            "endring": 0,
+            "stilling": {
+              "beholdning": 28000,
+              "endring": 0,
+              "avtaler": [
+                {
+                  "avtalenummer": "204396",
+                  "beholdning": 28000,
+                  "endring": 0
+                }
+              ]
+            },
+            "uføre": {
+              "beholdning": 4000,
+              "endring": 0,
+              "avtaler": [
+                {
+                  "avtalenummer": "204396",
+                  "beholdning": 3000,
+                  "endring": 0
+                },
+                {
+                  "avtalenummer": "203712",
+                  "beholdning": 1000,
+                  "endring": 0
+                }
+              ]
+            },
+            "aord": null,
+            "uspesifisert": null
+          },
+          {
+            "ordningsnummer": "4083",
+            "beholdning": 1800,
+            "endring": 0,
+            "stilling": null,
+            "uføre": null,
+            "aord": null,
+            "uspesifisert": {
+              "beholdning": 1800,
+              "endring": 0
+            }
+          },
+          {
+            "ordningsnummer": "3200",
+            "beholdning": 6200,
+            "endring": 0,
+            "stilling": null,
+            "uføre": null,
+            "aord": {
+              "beholdning": 6200,
+              "endring": 0,
+              "refusjoner": [
+                {
+                  "refusjonsnummer": "791",
+                  "beholdning": 5400,
+                  "endring": 0
+                },
+                {
+                  "refusjonsnummer": "318",
+                  "beholdning": 800,
+                  "endring": 0
+                }
+              ]
+            },
+            "uspesifisert": null
+          }
+        ]
+      },
+      "rest": {
+        "beholdning": 0,
+        "endring": -30175,
+        "ordninger": [
+          {
+            "ordningsnummer": "3010",
+            "beholdning": 60000,
+            "endring": 5000,
+            "stilling": {
+              "beholdning": 52000,
+              "endring": 5000,
+              "avtaler": [
+                {
+                  "avtalenummer": "204396",
+                  "beholdning": 38000,
+                  "endring": 5000
+                },
+                {
+                  "avtalenummer": "203712",
+                  "beholdning": 14000,
+                  "endring": 0
+                }
+              ]
+            },
+            "uføre": {
+              "beholdning": 8000,
+              "endring": 0,
+              "avtaler": [
+                {
+                  "avtalenummer": "204396",
+                  "beholdning": 8000,
+                  "endring": 0
+                }
+              ]
+            },
+            "aord": null,
+            "uspesifisert": null
+          },
+          {
+            "ordningsnummer": "3045",
+            "beholdning": 32000,
+            "endring": 0,
+            "stilling": {
+              "beholdning": 28000,
+              "endring": 0,
+              "avtaler": [
+                {
+                  "avtalenummer": "204396",
+                  "beholdning": 28000,
+                  "endring": 0
+                }
+              ]
+            },
+            "uføre": {
+              "beholdning": 4000,
+              "endring": 0,
+              "avtaler": [
+                {
+                  "avtalenummer": "204396",
+                  "beholdning": 3000,
+                  "endring": 0
+                },
+                {
+                  "avtalenummer": "203712",
+                  "beholdning": 1000,
+                  "endring": 0
+                }
+              ]
+            },
+            "aord": null,
+            "uspesifisert": null
+          },
+          {
+            "ordningsnummer": "4083",
+            "beholdning": 1800,
+            "endring": 0,
+            "stilling": null,
+            "uføre": null,
+            "aord": null,
+            "uspesifisert": {
+              "beholdning": 1800,
+              "endring": 0
+            }
+          },
+          {
+            "ordningsnummer": "3200",
+            "beholdning": 6200,
+            "endring": 0,
+            "stilling": null,
+            "uføre": null,
+            "aord": {
+              "beholdning": 6200,
+              "endring": 0,
+              "refusjoner": [
+                {
+                  "refusjonsnummer": "791",
+                  "beholdning": 5400,
+                  "endring": 0
+                },
+                {
+                  "refusjonsnummer": "318",
+                  "beholdning": 800,
+                  "endring": 0
+                }
+              ]
+            },
+            "uspesifisert": null
+          }
+        ]
+      },
+      "meta": {
+        "uttak": {
+          "uttaksgrad": 100,
+          "delingstall": 11.95
+        },
+        "tilførsel": null
+      }
+    }
+  ],
+  "beregningsmeldinger": [
+    {
+      "kode": 1331,
+      "grad": "Varsel",
+      "melding": "Kunne ikke beregne helt nøyaktig"
+    }
+  ]
+}

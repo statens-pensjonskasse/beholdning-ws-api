@@ -1,0 +1,8 @@
+{
+  "type": "about:blank",
+  "title": "Bad Request",
+  "status": 400,
+  "detail": "Ugyldig input",
+  "instance": "/api/beholdning/beregn",
+  "timestamp": "2024-10-09T07:27:47.0Z"
+}

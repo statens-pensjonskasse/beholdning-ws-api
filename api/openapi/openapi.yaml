@@ -1,0 +1,72 @@
+openapi: 3.0.2
+info:
+  title: beholdning-ws-api
+  description: OpenAPI specification for beholdning-ws.
+  version: @project.version@
+externalDocs:
+  description: Project on Bitbucket
+  url: https://git.spk.no/projects/PU_RET/repos/beholdning-ws-api/browse
+servers:
+  - url: /api
+tags:
+  - name: beholdning
+    description: Et medlems pensjonsbeholdning opptjent fra tilførsler.
+paths:
+  /beholdning/beregn:
+    post:
+      tags:
+        - beholdning
+      summary: Beregner beholdning og endringer i denne.
+      operationId: beregnBeholdningV5
+      parameters:
+        - name: parts
+          in: query
+          required: false
+          explode: false
+          description: >
+            Hvilke felter som skal populeres i resultatet bestemmes av konsum-
+            enten ved at en eller flere parter oppgis som query-param til ende-
+            punktet, separert med komma.
+            
+            Dersom ingen parter oppgis, returneres et minimalt resultat med
+            pensjonsbeholdningen slik den ser ut per dato.
+            
+            Eksempel: Dersom du ønsker å se den delen av pensjonsbeholdningen
+            som er opptjent fra en stilling med et gitt avtalenummer i en gitt
+            ordning, kaller du tjenesten med `?parts=ord,sti,avt` .
+            
+            Eksempel: Dersom du i tillegg ønsker å se en tilsvarende breakdown
+            for restbeholdningen, kaller du tjenesten med `?parts=rest,ord,sti,avt` .
+            
+            Eksempel: Dersom du i tillegg ønsker å se endringen fra forrige
+            dato, for eksempel for å se beløpet beholdningen er oppregulert med,
+            kaller du tjenesten med `?parts=rest,endr,ord,sti,avt` .
+          schema:
+            type: array
+            items:
+              $ref: './beholdning.yaml#/components/schemas/Part'
+      requestBody:
+        content:
+          application/vnd.spk.v5+json:
+            schema:
+              $ref: './beholdning.yaml#/components/schemas/BeregnBeholdningRequestV5'
+        required: true
+      responses:
+        '200':
+          description: Beholdning ble beregnet OK.
+          content:
+            application/vnd.spk.v5+json:
+              schema:
+                $ref: './beholdning.yaml#/components/schemas/BeregnBeholdningResponseV5'
+        '400':
+          $ref: './error.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: './error.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './error.yaml#/components/responses/Forbidden'
+        '500':
+          $ref: './error.yaml#/components/responses/InternalServerError'
+        '503':
+          $ref: './error.yaml#/components/responses/BadGateway'
+        '504':
+          $ref: './error.yaml#/components/responses/GatewayTimeout'

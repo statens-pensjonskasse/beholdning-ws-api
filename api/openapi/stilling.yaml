@@ -1,0 +1,354 @@
+components:
+  schemas:
+    Stillingsforhold:
+      type: object
+      required:
+        - forholdsnummer
+        - historikk
+      properties:
+        forholdsnummer:
+          type: string
+          pattern: '^\d+$'
+          example: '10860079'
+        historikk:
+          type: array
+          items:
+            $ref: '#/components/schemas/Stillingshistorikk'
+    Stillingshistorikk:
+      type: object
+      required:
+        - aksjonsdato
+        - aksjonskode
+        - lønn
+        - detaljer
+        - avtale
+      properties:
+        aksjonsdato:
+          type: string
+          format: date
+          example: '2023-03-31'
+        aksjonskode:
+          $ref: '#/components/schemas/Aksjonskode'
+        lønn:
+          $ref: '#/components/schemas/Lønn'
+        detaljer:
+          $ref: '#/components/schemas/Stillingsdetaljer'
+        permisjon:
+          $ref: '#/components/schemas/Permisjon'
+        avtale:
+          $ref: '#/components/schemas/Avtale'
+    Aksjonskode:
+      type: string
+      enum:
+        - '000' # StatusPerGittDato
+        - '011' # Nytilgang (Start i stilling)
+        - '012' # GjeninntredenEtterPermisjon
+        - '013' # Friskmelding
+        - '021' # EndringAvLønnEllerTjenestedata
+        - '023' # Sykmelding
+        - '028' # PermisjonUtenLønn
+        - '029' # PermisjonMedDelvisLønn
+        - '031' # Stillingsopphør
+      x-enum-varnames:
+        - StatusPerGittDato              # 000
+        - Nytilgang                      # 011 (Start i stilling)
+        - GjeninntredenEtterPermisjon    # 012
+        - Friskmelding                   # 013
+        - EndringAvLønnEllerTjenestedata # 021
+        - Sykmelding                     # 023
+        - PermisjonUtenLønn              # 028
+        - PermisjonMedDelvisLønn         # 029
+        - Stillingsopphør                # 031 (Slutt i stilling)
+      example: '011'
+    Lønn:
+      type: object
+      required:
+        - regulativkode
+        - lønn
+        - stillingsprosent
+        - fungering
+      properties:
+        regulativkode:
+          $ref: '#/components/schemas/Lønnsregulativkode'
+        lønnstrinn:
+          type: integer
+          minimum: 0
+          example: 50
+        lønn:
+          type: integer
+          minimum: 0
+          example: 500000
+        stillingsprosent:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 200.0
+          example: 100.0
+        fungering:
+          type: boolean
+          example: false
+        fasteTillegg:
+          type: integer
+          minimum: 1
+          example: 5000
+        variableTillegg:
+          type: integer
+          minimum: 1
+          example: 2000
+        funksjonstillegg:
+          type: integer
+          minimum: 1
+          example: 3000
+        stillingskode:
+          $ref: '#/components/schemas/Stillingskode'
+    Lønnsregulativkode:
+      type: string
+      enum:
+        - '1'   # Stat75
+        - '2'   # StatBetTrinn75
+        - '3'   # OverenskLønn75
+        - '4'   # StatPers75
+        - '5'   # IndividLønn75
+        - '7'   # RegFør75Lklasse
+        - '8'   # RegFør75Sjef
+        - '11'  # SerRegPost1
+        - '12'  # SerRegPost2
+        - '13'  # SerRegPost3
+        - '21'  # SerRegKorn
+        - '23'  # SerRegStatkraft
+        - '25'  # SerRegStatnett
+        - '31'  # SerRegPol1
+        - '32'  # SerRegPol2
+        - '36'  # SerRegPol3
+        - '37'  # SerRegPol4
+        - '41'  # SerRegMedDepot
+        - '51'  # Stat91
+        - '52'  # StatBetTrinn91
+        - '53'  # OverenskLønn91
+        - '54'  # StatPers91
+        - '55'  # IndividLønn91
+        - '61'  # Stat94
+        - '62'  # StatBetTrinn94
+        - '63'  # OverenskLønn94
+        - '64'  # StatPers94
+        - '65'  # IndividLønn94
+        - '71'  # Stat96
+        - '72'  # StatBetTrinn96
+        - '73'  # OverenskLønn96
+        - '74'  # StatPers96
+        - '75'  # IndividLønn96
+        - '98'  # SerRegPol5
+        - '101' # ApotekTrinn
+        - '105' # ApotekBeløp
+        - '271' # Stat96Timelønn
+        - '272' # StatBetTrinn96Timelønn
+        - '273' # OverenskLønn96Timelønn
+        - '274' # StatPers96Timelønn
+        - '275' # IndividLønn96Timelønn
+      x-enum-varnames:
+        - Stat75                 # 1
+        - StatBetTrinn75         # 2
+        - OverenskLønn75         # 3
+        - StatPers75             # 4
+        - IndividLønn75          # 5
+        - RegFør75Lklasse        # 7
+        - RegFør75Sjef           # 8
+        - SerRegPost1            # 11
+        - SerRegPost2            # 12
+        - SerRegPost3            # 13
+        - SerRegKorn             # 21
+        - SerRegStatkraft        # 23
+        - SerRegStatnett         # 25
+        - SerRegPol1             # 31
+        - SerRegPol2             # 32
+        - SerRegPol3             # 36
+        - SerRegPol4             # 37
+        - SerRegMedDepot         # 41
+        - Stat91                 # 51
+        - StatBetTrinn91         # 52
+        - OverenskLønn91         # 53
+        - StatPers91             # 54
+        - IndividLønn91          # 55
+        - Stat94                 # 61
+        - StatBetTrinn94         # 62
+        - OverenskLønn94         # 63
+        - StatPers94             # 64
+        - IndividLønn94          # 65
+        - Stat96                 # 71
+        - StatBetTrinn96         # 72
+        - OverenskLønn96         # 73
+        - StatPers96             # 74
+        - IndividLønn96          # 75
+        - SerRegPol5             # 98
+        - ApotekTrinn            # 101
+        - ApotekBeløp            # 105
+        - Stat96Timelønn         # 271
+        - StatBetTrinn96Timelønn # 272
+        - OverenskLønn96Timelønn # 273
+        - StatPers96Timelønn     # 274
+        - IndividLønn96Timelønn  # 275
+      example: '1'
+    Stillingskode:
+      type: string
+      minLength: 1
+      example: '2298'
+    Stillingsdetaljer:
+      type: object
+      required:
+        - aldersgrense
+      properties:
+        aldersgrense:
+          type: integer
+          minimum: 0
+          example: 67
+        organisasjonsnummer:
+          type: string
+          pattern: '^\d{9}$'
+          example: 987654321
+    Permisjon:
+      type: object
+      properties:
+        permisjonskode:
+          $ref: '#/components/schemas/Permisjonskode'
+        permisjonsavtale:
+          $ref: '#/components/schemas/Permisjonsavtale'
+    Permisjonskode:
+      type: string
+      enum:
+        - '01' # UtenLønn
+        - '02' # MedDelvisLønn
+        - '03' # MedregningInntil1År
+        - '04' # MedregningInntil2År
+        - '05' # MedregningInntil3År
+        - '06' # MedregningInntil4År
+        - '07' # Ubegrenset
+        - '08' # MedregningInntil5År
+      x-enum-varnames:
+        - UtenLønn            # 01
+        - MedDelvisLønn       # 02
+        - MedregningInntil1År # 03
+        - MedregningInntil2År # 04
+        - MedregningInntil3År # 05
+        - MedregningInntil4År # 06
+        - Ubegrenset          # 07
+        - MedregningInntil5År # 08
+      example: '01'
+    Permisjonsavtale:
+      type: string
+      enum:
+        - '1a'   # Militærtjeneste
+        - '1b'   # SykdomIFamilien
+        - '1c'   # PermisjonPgaStreik
+        - '2a'   # OmsorgForBarn
+        - '2b'   # Studiepermisjon
+        - '2c'   # Ektefellebeordring
+        - '2d'   # SendelektorUtlandet
+        - '3a'   # InternasjonalOrganisasjon
+        - '4a'   # Tjenestemannsorganisasjon
+        - '4b'   # FylkesOgKommunaleVerv
+        - '4c'   # DomsmannMeddommer
+        - '5'    # ForlengetAvStyre
+        - '6a'   # FødselAdopsjon
+        - '6b'   # GodkjentAvDepartement
+        - 'A.01' # Adopsjon
+        - 'A.02' # EktefellebeordringGammel
+        - 'A.03' # MedregnetFravær
+        - 'A.04' # Fødsel
+        - 'A.05' # MilitærtjenesteUtlandet
+        - 'A.06' # MilitærtjenesteGammel
+        - 'A.07' # PermisjonPgaStreikGammel
+        - 'A.08' # SendelektorUtlandetGammel
+        - 'A.09' # StudiereiseUtlandet
+        - 'A.10' # SykdomIFamilienGammel
+        - 'A.11' # Velferdspermisjon
+        - 'A.12' # VidereutdanningApotek
+        - 'B.01' # InternasjonalOrganisasjonGammel
+        - 'B.02' # NordiskTjeneste
+        - 'B.03' # Omsorgstjeneste
+        - 'B.04' # TillitsvalgtTjenestemannsorganisasjon
+        - 'B.05' # TjenesteITjenestemannsorganisasjon
+        - 'B.06' # UtdannelseForStatstjeneste
+        - 'C'    # ForlengetAvStyreGammel
+        - 'D'    # GodkjentAvDepartementGammel
+      x-enum-varnames:
+        - Militærtjeneste                       # 1a
+        - SykdomIFamilien                       # 1b
+        - PermisjonPgaStreik                    # 1c
+        - OmsorgForBarn                         # 2a
+        - Studiepermisjon                       # 2b
+        - Ektefellebeordring                    # 2c
+        - SendelektorUtlandet                   # 2d
+        - InternasjonalOrganisasjon             # 3a
+        - Tjenestemannsorganisasjon             # 4a
+        - FylkesOgKommunaleVerv                 # 4b
+        - DomsmannMeddommer                     # 4c
+        - ForlengetAvStyre                      # 5
+        - FødselAdopsjon                        # 6a
+        - GodkjentAvDepartement                 # 6b
+        - Adopsjon                              # A.01
+        - EktefellebeordringGammel              # A.02
+        - MedregnetFravær                       # A.03
+        - Fødsel                                # A.04
+        - MilitærtjenesteUtlandet               # A.05
+        - MilitærtjenesteGammel                 # A.06
+        - PermisjonPgaStreikGammel              # A.07
+        - SendelektorUtlandetGammel             # A.08
+        - StudiereiseUtlandet                   # A.09
+        - SykdomIFamilienGammel                 # A.10
+        - Velferdspermisjon                     # A.11
+        - VidereutdanningApotek                 # A.12
+        - InternasjonalOrganisasjonGammel       # B.01
+        - NordiskTjeneste                       # B.02
+        - Omsorgstjeneste                       # B.03
+        - TillitsvalgtTjenestemannsorganisasjon # B.04
+        - TjenesteITjenestemannsorganisasjon    # B.05
+        - UtdannelseForStatstjeneste            # B.06
+        - ForlengetAvStyreGammel                # C
+        - GodkjentAvDepartementGammel           # D
+      example: '1a'
+    Avtale:
+      type: object
+      required:
+        - startdato
+        - avtalenummer
+        - ordningsnummer
+        - arbeidsgiver
+      properties:
+        startdato:
+          type: string
+          format: date
+          example: '2023-01-01'
+        sluttdato:
+          type: string
+          format: date
+          example: '2025-12-31'
+        avtalenummer:
+          type: string
+          pattern: '^\d+$'
+          example: '254760'
+        ordningsnummer:
+          type: string
+          pattern: '^\d+$'
+          example: '3010'
+        oppgjørsmåned:
+          type: integer
+          minimum: 1
+          maximum: 12
+          example: 1
+        premiestatus:
+          type: string
+          minLength: 1
+          example: 'AAO-17'
+        arbeidsgiver:
+          $ref: '#/components/schemas/Arbeidsgiver'
+    Arbeidsgiver:
+      type: object
+      properties:
+        gruppe:
+          type: string
+          minLength: 1
+          example: '01'
+        kriterie:
+          type: string
+          minLength: 1
+          example: '2'

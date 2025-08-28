@@ -1,0 +1,130 @@
+components:
+  responses:
+    BadRequest:
+      description: Bad Request. Ressursen man sendte inn hadde ugyldig format.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: 'about:blank'
+            title: Bad Request
+            status: 400
+            detail: "Field error in object 'createCustomerRequest' on field 'customer.email': rejected value [john.doe@@example.com]; codes [Email]; arguments []; default message [must be a well-formed email address]"
+            instance: /api/customers
+            timestamp: '2024-10-09T07:27:47.987569566Z'
+            stacktrace: 'org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0]'
+    Unauthorized:
+      description: Unauthorized. Sikkerhetstoken mangler i kallet til tjenesten.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: 'about:blank'
+            title: Unauthorized
+            status: 401
+            detail: Token er utløpt, ugyldig eller kommer ifra et annet miljø
+            instance: /api/customers
+            timestamp: '2024-10-09T07:27:47.987569566Z'
+    Forbidden:
+      description: Forbidden. Sikkerhetstoken har ikke tilgang til tjenesten.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: 'about:blank'
+            title: Forbidden
+            status: 403
+            detail: Token har ikke påkrevd rolle
+            instance: /api/customers
+            timestamp: '2024-10-09T07:27:47.987569566Z'
+    NotFound:
+      description: Not Found. Ressursen finnes ikke.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: 'about:blank'
+            title: Not Found
+            status: 404
+            detail: Kunden finnes ikke
+            instance: /api/customers
+            timestamp: '2024-10-09T07:27:47.987569566Z'
+    InternalServerError:
+      description: Internal Server Error. Tjenesten feilet på en måte som ikke ble håndtert.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: 'about:blank'
+            title: Internal Server Error
+            status: 500
+            detail: Cannot read field 'fødselsdato' because 'no.freg.api.FregClient.hentPerson(kotlin.String).fødselsdato' is null
+            instance: /api/customers
+            timestamp: '2024-10-09T07:27:47.987569566Z'
+            stacktrace: "java.lang.NullPointerException: Cannot read field 'fødselsdato' because 'no.freg.api.FregClient.hentPerson(kotlin.String).fødselsdato' is null\n\tat com.example.customer.ws.service.CustomerService.getCustomer(CustomerService.kt:38)\n\tat com.example.customer.ws.controller.CustomerAdapter.getCustomer(CustomerAdapter.kt:18)\n\tat com.example.customer.ws.controller.CustomerController.getCustomer(CustomerController.kt:69)\n\tat java.base/java.lang.Thread.run(Thread.java:1583)"
+    BadGateway:
+      description: Bad Gateway. Tjenesten brukte en underliggende tjeneste som feilet.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: 'about:blank'
+            title: Bad Gateway
+            status: 503
+            detail: 'Kunne ikke hente fødselsdato fra Folkeregisteret: Norges sentraldatabase er nede!'
+            instance: /api/customers
+            timestamp: '2024-10-09T07:27:47.987569566Z'
+            stacktrace: "org.springframework.web.server.ResponseStatusException: 502 BAD_GATEWAY 'Kunne ikke hente fødselsdato fra Folkeregisteret: Norges sentraldatabase er nede!'\n\tat com.example.customer.ws.controller.CustomerController.getCustomer(CustomerController.kt:77)\n\tat java.base/java.lang.Thread.run(Thread.java:1583)\nCaused by: com.example.customer.ws.controller.BadGateway: Kunne ikke hente fødselsdato fra Folkeregisteret: Norges sentraldatabase er nede!\n\tat com.example.customer.ws.service.CustomerService.getCustomer(CustomerService.kt:210)\n\tat com.example.customer.ws.service.CustomerAdapter.getCustomer(CustomerAdapter.kt:18)\nCaused by: no.freg.api.FregClientException: Norges sentraldatabase er nede!\n\tat no.freg.api.FregClient.hentPerson(FregClient.java:120)\nCaused by: HttpServerError{uri=https://folkeregisteret.api.skatteetaten.no/personer/01017012345, method=GET, statusCode=500, headers={content-type=[text/plain]}, body='Norges sentraldatabase er nede!'}\n\tat no.freg.api.FregClient.hentPerson(FregClient.java:111)"
+    GatewayTimeout:
+      description: Gateway Timeout. Tjenesten brukte en underliggende tjeneste som tok for lang tid til å svare.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: 'about:blank'
+            title: Gateway Timeout
+            status: 504
+            detail: 'Kunne ikke hente fødselsdato fra Folkeregisteret: request timed out'
+            instance: /api/customers
+            timestamp: '2024-10-09T07:27:47.987569566Z'
+            stacktrace: "org.springframework.web.server.ResponseStatusException: 503 GATEWAY_TIMEOUT 'Kunne ikke hente fødselsdato fra Folkeregisteret: request timed out'\n\tat com.example.customer.ws.controller.CustomerController.getCustomer(CustomerController.kt:77)\n\tat java.base/java.lang.Thread.run(Thread.java:1583)\nCaused by: com.example.customer.ws.controller.GatewayTimeout: Kunne ikke hente fødselsdato fra Folkeregisteret: Norges sentraldatabase er nede!\n\tat com.example.customer.ws.service.CustomerService.getCustomer(CustomerService.kt:210)\n\tat com.example.customer.ws.service.CustomerAdapter.getCustomer(CustomerAdapter.kt:18)\nCaused by: no.freg.api.FregClientException: request timed out\n\tat no.freg.api.FregClient.hentPerson(FregClient.java:120)\nCaused by: java.net.http.HttpTimeoutException: request timed out\n\tat no.freg.api.FregClient.hentPerson(FregClient.java:111)"
+  schemas:
+    ProblemDetails:
+      type: object
+      required:
+        - type
+        - title
+        - status
+        - detail
+        - instance
+        - timestamp
+      properties:
+        type:
+          type: string
+          example: 'about:blank'
+        title:
+          type: string
+          example: Gateway Timeout
+        status:
+          type: integer
+          example: 504
+        detail:
+          type: string
+          example: 'Kunne ikke hente fødselsdato fra Folkeregisteret: request timed out'
+        instance:
+          type: string
+          example: /api/customers
+        timestamp:
+          type: string
+          format: date-time
+          example: '2024-10-09T07:27:47.987569566Z'
+        stacktrace:
+          type: string
+          example: "org.springframework.web.server.ResponseStatusException: 503 GATEWAY_TIMEOUT 'Kunne ikke hente fødselsdato fra Folkeregisteret: request timed out'\n\tat com.example.customer.ws.controller.CustomerController.getCustomer(CustomerController.kt:77)\n\tat java.base/java.lang.Thread.run(Thread.java:1583)\nCaused by: com.example.customer.ws.controller.GatewayTimeout: Kunne ikke hente fødselsdato fra Folkeregisteret: Norges sentraldatabase er nede!\n\tat com.example.customer.ws.service.CustomerService.getCustomer(CustomerService.kt:210)\n\tat com.example.customer.ws.service.CustomerAdapter.getCustomer(CustomerAdapter.kt:18)\nCaused by: no.freg.api.FregClientException: request timed out\n\tat no.freg.api.FregClient.hentPerson(FregClient.java:120)\nCaused by: java.net.http.HttpTimeoutException: request timed out\n\tat no.freg.api.FregClient.hentPerson(FregClient.java:111)"
