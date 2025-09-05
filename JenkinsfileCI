@@ -1,0 +1,10 @@
+#!groovy
+@Library('jenkins-pipeline-library')
+import no.spk.jenkins.pipeline.ci.config.CIPipelineConfig
+
+ciPipeline {
+    config = CIPipelineConfig
+            .getTrunkBasedConfig(trunk: 'main')
+            .useMaven(build: 'clean install', buildImage: 'cr.spk.no/base/maven-node:zulu-openjdk-21-node-22')
+            .withSlackNotifications(channels: 'rettighet-ci')
+}

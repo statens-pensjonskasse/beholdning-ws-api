@@ -1,0 +1,7 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "local>statens-pensjonskasse/renovate-presets-internal:daily-automerge-non-major",
+    "local>statens-pensjonskasse/renovate-presets-internal:gal-updates-automerge-and-skip-publish"
+  ]
+}

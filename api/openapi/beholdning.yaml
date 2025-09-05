@@ -1,0 +1,939 @@
+components:
+  schemas:
+    Part:
+      type: string
+      enum:
+        - rest
+        - endr
+        - ord
+        - sti
+        - ufo
+        - aord
+        - uspes
+        - avt
+        - ref
+        - umeta
+        - tmeta
+      description: >
+        Part bestemmer hvilke felter som skal populeres i resultatet.
+        
+        `rest`:
+        Styrer hvorvidt restbeholdningen skal inkluderes i resultatet. Dersom
+        man ikke ber om restbeholdning, får man kun beholdningsendringer som
+        påvirker pensjonsbeholdningen, altså beholdningsendringer av typen
+        regulering, gradsendring, og tilvekst.
+        
+        `endr`:
+        Styrer hvorvidt beholdningsendringen fra forrige dato skal inkluderes i
+        resultatet.
+        
+        `ord`:
+        Styrer hvorvidt delbeholdning per ordning skal inkluderes i resultatet.
+        
+        `sti`:
+        Styrer hvorvidt samlet delbeholdning fra stilling skal inkluderes i
+        resultatet per ordning.
+        
+        `ufo`:
+        Styrer hvorvidt samlet delbeholdning fra uføre skal inkluderes i res-
+        ultatet per ordning.
+        
+        `aord`:
+        Styrer hvorvidt samlet delbeholdning fra annen ordning skal inkluderes i
+        resultatet per ordning.
+        
+        `avt`:
+        Styrer hvorvidt delbeholdning per avtale skal inkluderes i resultatet
+        per samlet delbeholdning fra stilling og uføre per ordning.
+        
+        `ref`:
+        Styrer hvorvidt delbeholdning per refusjon skal inkluderes i resultatet
+        per samlet delbeholdning per annen ordning.
+        
+        `umeta`:
+        Styrer hvorvidt metadata for uttak skal inkluderes i resultatet.
+        
+        `tmeta`:
+        Styrer hvorvidt metadata for tilførsler skal inkluderes i resultatet.
+    BeregnBeholdningRequestV5:
+      type: object
+      description: >
+        Alt som skal til for å beregne beholdning og endringer i denne fram til
+        en gitt beregningsdato for et gitt beholdningsprodukt, medlemmets gitte
+        opptjening, gradsendringer, og månedskull angitt ved fødselsdato.
+        
+        Til sammen lar dette tjenesten beregne en beholdning som endrer seg over
+        tid (beholdningsendringer) basert på medlemmets til enhver tid ønskede
+        uttaksgrad, angitt med gradsendringer.
+      required:
+        - fødselsdato
+        - beregningsdato
+        - produkt
+        - opptjening
+        - gradsendringer
+      properties:
+        fødselsdato:
+          type: string
+          format: date
+          description: >
+            Fødselsdato for medlemmet beholdningen beregnes for.
+            
+            Brukes til å slå opp korrekte delingstall for dette år og måneds-
+            kullet.
+          example: '1963-09-19'
+        startdato:
+          type: string
+          format: date
+          description: >
+            Startdato avgjør hvor langt tilbake i tid tilførsler skal beregnes,
+            og skal normalt ikke settes ettersom tilførsler for påslagspensjon
+            og betinget tjenestepensjon ikke skal beregnes før 1.1.2020, som er
+            default.
+            
+            Startdato er tiltenkt bruk for beregning av livsvarig AFP der
+            konsumenter i stedet beregner betinget tjenestepensjon, inkludert
+            opptjening før 2020, og justerer satser selv.
+          example: '2020-01-01'
+        beregningsdato:
+          type: string
+          format: date
+          description: >
+            Beregningsdato avgjør hvor langt fram i tid beholdningsendringer
+            skal beregnes, uavhengig av opptjeningen og gradsendringene som
+            sendes inn. Ingen beholdningsendringer vil inkluderes i responsen
+            etter denne dato.
+            
+            Siste linje i beholdningsendringene representerer beholdningen slik
+            den ser ut på beregningsdato, og ofte kan man derfor sende inn
+            dagens dato som beregningsdato for å se hvordan beholdningene ser ut
+            akkurat nå.
+
+            Dersom for eksempel beregningsdato oppgis til samme tidspunkt som
+            første gradsendring, vil medlemmet ha en pensjonsbeholdning (og en
+            restbeholdning ved delvis uttak) slik den ser ut ved start av
+            pensjon.
+            
+            Typisk settes beregningsdato til dato for siste gradsendring. Dersom
+            beregningsdato oppgis til et tidspunkt etter siste gradsendring, vil
+            medlemmet ha en pensjonsbeholdning som har vært justert for alle
+            uttak fram til da, samt eventuelle tilvekster.
+
+            Dersom beregningsdato oppgis til et tidspunkt før første grads-
+            endring, eller ingen gradsendringer sendes inn, vil medlemmet kun ha
+            en restbeholdning og ingen pensjonsbeholdning, ettersom ingen deler
+            av beholdningen er avsatt til pensjon enda. Dette kan være nyttig
+            dersom man ønsker å få innsyn hva den løpende restbeholdning er,
+            typisk for prognose. Kombinert med en simulert gradsendring på samme
+            dato vil man kunne se pensjonsbeholdningen slik den ville sett ut
+            ved en tenkt start av pensjon.
+          example: '2025-02-01'
+        produkt:
+          $ref: '#/components/schemas/Beholdningsprodukt'
+        opptjening:
+          $ref: '#/components/schemas/Opptjening'
+        gradsendringer:
+          type: array
+          items:
+            $ref: '#/components/schemas/Gradsendring'
+    Beholdningsprodukt:
+      type: string
+      enum:
+        - Påslagspensjon
+        - BetingetTjenestepensjon
+      example: Påslagspensjon
+      description: >
+        Det finnes to pensjonsprodukter man kan beregne beholdning for, påslags-
+        pensjon og betinget tjenestepensjon.
+    Opptjening:
+      type: object
+      description: >
+        Alt som potensielt påvirker beholdningen til medlemmet.
+        
+        Det er kun stilling og uføre som bidrar til beholdningen. For SPK om-
+        regnes disse først implisitt internt i tjenesten til tilførsler fra SPK,
+        som kombineres med tilførsler fra andre ordninger (aord), som oppgis
+        eksplisitt til tjenesten.
+        
+        Det utveksles ikke stillingshistorikk og uførepensjoner med andre ord-
+        ninger, kun ferdig beregnede tilførsler, slik at stilling og uføre som
+        sendes inn her kun er det som stammer fra SPK.
+        
+        Det er likevel noen spesielle regler (blant annet knyttet til bistilling
+        hos andre ordninger), som påvirker tilførslene fra SPK, så for å få en
+        nøyaktig beregning må man i tillegg derfor sende inn informasjon om med-
+        regning.
+      required:
+        - stillingsforhold
+        - uførepensjoner
+        - andreOrdninger
+        - medregninger
+      properties:
+        stillingsforhold:
+          type: array
+          items:
+            $ref: './stilling.yaml#/components/schemas/Stillingsforhold'
+        uførepensjoner:
+          type: array
+          items:
+            $ref: './pensjon.yaml#/components/schemas/Pensjon'
+        andreOrdninger:
+          type: array
+          items:
+            $ref: '#/components/schemas/OpptjeningAord'
+        medregninger:
+          type: array
+          items:
+            $ref: '#/components/schemas/Medregning'
+    OpptjeningAord:
+      type: object
+      description: >
+        Opptjening fra annen ordning (aord). Oppgis per ordning, for eksempel
+        Storebrand (4083) eller KLP (3200).
+        
+        Opptjening for ordninger underlagt SPK skal ikke oppgis her, da til-
+        førsler fra SPK omregnes internt av tjenesten basert på stilling og
+        uføre.
+        
+        Alternativt kan opptjening (stilling og uføre) for ordninger underlagt
+        SPK utelates og heller sendes inn som tilførsler her, men da gir heller
+        ikke tjenesten ut metadata med detaljer som er spesifikt for SPK, slikt
+        som stillingsprosent, uføregrad, osv.
+        
+        NB! Tjenesten vil telle beholdning dobbelt dersom man gjør begge deler!
+      required:
+        - ordningsnummer
+        - startbeholdninger
+        - tilførsler
+      properties:
+        ordningsnummer:
+          type: string
+          pattern: '^\d$'
+          example: '3010'
+          description: Ordningsnummeret for ordningen opptjeningen stammer fra.
+        startbeholdninger:
+          type: array
+          items:
+            $ref: '#/components/schemas/StartbeholdningAord'
+        tilførsler:
+          type: array
+          items:
+            $ref: '#/components/schemas/TilførselAord'
+    StartbeholdningAord:
+      type: object
+      description: >
+        Startbeholdning fra annen ordning (aord). Opptjente midler fram til
+        første uttak, *inkludert* regulering.
+        
+        NB! Startbeholdning fra annen ordning er en workaround som kan brukes
+        inntil den andre ordningen har en tjeneste som gir oss tilførsler i
+        stedet. Bruk av startbeholdning framfor tilførsler vil gi feil beregning
+        av beholdning for medlemmer som kombinerer jobb og pensjon fra og med 1.
+        februar 2025, og avviket vil øke med tiden. Dette er fordi annen ordning
+        ikke spesifiserer for hvilket tidspunkt beholdningen er gjeldendene, og
+        tjenesten må derfor gjøre en antakelse om at startbeholdningen gjelder
+        fra dato for start av pensjon (første gradsendring). Overgangen til
+        tilførsler fra annen ordning løser dette.
+      required:
+        - beløp
+      properties:
+        beløp:
+          type: integer
+          minimum: 1
+          example: '330100'
+          description: Startbeholdning fra annen ordning.
+    TilførselAord:
+      type: object
+      description: >
+        Tilførsel fra annen ordning (aord). Stilling og uføre omgjort til
+        opptjente midler, *ekskludert* regulering.
+        
+        Annen ordning rapporterer ikke hvorvidt tilførselen stammer fra stilling
+        eller uføre, slik at disse regnes under ett.
+      required:
+        - dato
+        - beløp
+      properties:
+        dato:
+          type: string
+          format: date
+          example: '2025-04-01'
+          description: >
+            Dato tilførselen skal regnes med i beholdningen fra og med.
+            
+            Dersom beholdningen var kr 0 den 31. mars, vil en tilførsel på
+            kr 3090 den 1. april medføre at beholdningen er kr 3090 per
+            1. april.
+            
+            Tilførsler skal ikke regnes med i beholdningen før måneden etter
+            opptjeningen fant sted, og datoen som oppgis her skal derfor typisk
+            settes til den første i måneden etter. For eksempel, for en til-
+            førsel som ble opptjent fra 1-17. mars, skal 1. april benyttes som
+            dato for denne. For en tilførsel som ble opptjent fra 11. mai til
+            19. juni, skal 1. juli benyttes som dato for denne (men normalt
+            oppgis tilførsler per måned).
+            
+            Grunnen til at tjenesten ikke gjør dette selv er fordi konsumenter
+            sitter på ulike data, noen har tilførselsperioden med fra- og til-
+            dato, andre har kun tilførseldatoen.
+        refusjonsnummer:
+          type: string
+          minLength: 1
+          example: '1000001801452001'
+          description: >
+            Refusjonsnummer fra annen ordning, også kjent som refusjonId.
+            
+            Dersom annen ordning oppgir denne som tom string, eller annen
+            “ikke-verdi”, er det mer presist at hele feltet utelates her.
+        beløp:
+          type: integer
+          minimum: 1
+          example: 3090
+          description: >
+            Tilførselsbeløpet fra annen ordning.
+            
+            Dersom annen ordning oppgir denne som 0, er det mer presist at hele
+            tilførselen utelates her.
+    Medregning:
+      type: object
+      description: >
+        Medregning er tjenestetid som påvirker beregningen av tilførsler (og
+        dermed beholdning) hos SPK.
+      required:
+        - medregningskode
+        - lønn
+      properties:
+        medregningskode:
+          $ref: '#/components/schemas/Medregningskode'
+        startdato:
+          type: string
+          format: date
+          example: '2025-03-01'
+        sluttdato:
+          type: string
+          format: date
+          example: '2025-03-31'
+        lønn:
+          type: integer
+          minimum: 0
+          example: 609000
+    Medregningskode:
+      type: string
+      enum:
+        - Bistilling
+        - TilleggAnnenArbeidsgiver
+      description: >
+        Det er kun to medregningskoder som er relevante for tilførselsberegning-
+        en (og dermed beholdningen), alle andre koder kan derfor sløyfes inn til
+        tjenesten.
+        
+        Se [fagportalen](http://fagportalen.spk.no/toppmeny/tabeller/) for
+        forklaring og dokumentasjon for de forskjellige kodene.
+    Gradsendring:
+      type: object
+      description: >
+        Gradsendring. Oppgir når medlemmet starter, endrer, eller stopper uttak.
+        
+        Gradsendringer produserer en beholdningsendring av typen gradsendring
+        med en oppdatert pensjonsbeholdning.
+        
+        Pensjonsprodukt er implisitt, da hele utregningen gjøres for ett produkt
+        om gangen. Det er derfor viktig at gradsendringene som sendes inn her
+        alle gjelder for produktet som oppgis på nivået over.
+        
+        Gradsendringer utover start av pensjon er kun relevant for påslagspen-
+        sjon, da betinget tjenestepensjon alltid må tas ut 100 %. Betinget tjen-
+        estepensjon må likevel oppgi første gradsendring (start av pensjon).
+      required:
+        - dato
+        - uttaksgrad
+      properties:
+        dato:
+          type: string
+          format: date
+          example: '2025-02-01'
+          description: >
+            Dato gradsendringen skal regnes med i beholdningen fra og med.
+            
+            Tidligste dato for pensjonering er den første dagen i måneden etter
+            medlemmet når pensjonsalder (62 år), og seneste dato for pensjoner-
+            ing er den første dagen i måneden etter medlemmet fyller 75 år. Det
+            kan ikke oppgis gradsendringer utenfor denne perioden, da det ikke
+            finnes delingstall for slike årskull.
+
+            Eksempel: Et medlem født 28.01.1963, vil
+            1. tidligst kunne pensjonere seg den 01.02.2025, og
+            2. senest kunne pensjonere seg den 01.02.2038.
+
+            ```kotlin
+            val fødselsdato = LocalDate.of(1963, 1, 28) // 1963-01-28
+            val tidligstePensjonsdato = fødselsdato.plusYears(62).plusMonths(1).withDayOfMonth(1) // 2025-02-01
+            val senestePensjonsdato = fødselsdato.plusYears(75).plusMonths(1).withDayOfMonth(1) // 2038-02-01
+            ```
+        uttaksgrad:
+          $ref: '#/components/schemas/Uttaksgrad'
+    Uttaksgrad:
+      type: integer
+      enum:
+        - 0
+        - 20
+        - 40
+        - 50
+        - 60
+        - 80
+        - 100
+      example: 80
+      description: >
+        Uttaksgrad bestemt av medlemmet, i prosent.
+        
+        Kun relevant for påslagspensjon, da betinget tjenestepensjon alltid
+        må tas ut 100 %. Betinget tjenestepensjon må likevel oppgi dette.
+        
+        En pensjonsbeholdning som oppgis sammen med en uttaksgrad er alltid fer-
+        dig gradert med denne uttaksgraden. En restbeholdning som oppgis sammen
+        med en uttaksgrad er alltid ferdig avkortet med denne uttaksgraden.
+    BeregnBeholdningResponseV5:
+      type: object
+      description: Beregnet beholdning og endringer i denne.
+      required:
+        - produkt
+        - beholdningsendringer
+        - feilOgVarsler
+      properties:
+        produkt:
+          $ref: '#/components/schemas/Beholdningsprodukt'
+        beholdningsendringer:
+          type: array
+          items:
+            $ref: '#/components/schemas/Beholdningsendring'
+        beregningsmeldinger:
+          type: array
+          items:
+            $ref: '#/components/schemas/Beregningsmelding'
+    Beholdningsendring:
+      type: object
+      description: Beregnet beholdning og endringer i denne.
+      required:
+        - dato
+        - type
+        - pensjon
+      properties:
+        dato:
+          type: string
+          format: date
+          example: '2025-02-01'
+          description: Dato beholdningen gjelder fra og med.
+        type:
+          $ref: '#/components/schemas/Beholdningsendringstype'
+        pensjon:
+          $ref: '#/components/schemas/Beholdning'
+        rest:
+          $ref: '#/components/schemas/Beholdning'
+        meta:
+          $ref: '#/components/schemas/BeholdningsendringMeta'
+    Beholdningsendringstype:
+      type: string
+      enum:
+        - Tilførsel
+        - Regulering
+        - Tilbakeføring
+        - Gradsendring
+        - Tilvekst
+      example: Tilførsel
+      description: >
+        Type beholdningsendring.
+        
+        Det er forskjellige typer hendelser som påvirker pensjonsbeholdningen,
+        restbeholdningen, eller begge.
+        
+        Tilførsel. Opptjening (stilling og uføre) omgjort til opptjente midler,
+        tilføres typisk restbeholdningen den 1. i hver måned. Påvirker ikke
+        pensjonsbeholdningen, kun restbeholdningen.
+        
+        Regulering. Påvirker både pensjonsbeholdningen og restbeholdningen, som
+        reguleres hver for seg, med satser for henholdsvis pensjonsvekst og
+        lønnsvekst.
+        
+        Tilbakeføring. Når medlemmet endrer uttaksgrad, vil pensjonsbeholdningen
+        enten øke eller minke, men i stedet for å regne ut forskjellen, gjøres
+        det i stedet en komplett tilbakeføring av midler fra pensjonsbeholdning-
+        en i forkant av hvert uttak (gradsendring eller tilvekst). Beløpet ber-
+        egnes fra pensjonsbeholdningen multiplisert med delingstall per dato for
+        uttaket delt på delingstall per dato for forrige uttak.
+        
+        Gradsendring. Når medlemmet starter, endrer, eller stopper uttak, flyt-
+        tes midler fra restbeholdningen til pensjonsbeholdningen. Beløpet bereg-
+        nes fra restbeholdningen avkortet med uttaksgrad. Det gjøres alltid en
+        tilbakeføring før hver gradsendring.
+        
+        Tilvekst. Opptjente midler i restbeholdningen tilføres pensjonsbehold-
+        ningen automatisk den 1. januar hvert år ved 100 % uttaksgrad. Beløpet
+        beregnes på samme måte som for gradsendring. Det gjøres alltid en til-
+        bakeføring før hver tilvekst.
+        
+        Uttakssgivende beholdningsendringer er de som utløser en endring i pen-
+        sjonsuttaket, slikt som gradsendring og tilvekst. Resten av beholdnings-
+        endringene er ikke uttaksgivende, men beskriver gjerne endringer i rest-
+        beholdningen, slikt som tilførsel og tilbakeføring.
+        
+        Det kan argumenteres for at regulering kunne vært en uttakssgivende beh-
+        oldningsendring, men p.t. er det bestemt at regulering gjøres uavhengig
+        av denne beregningen. Regulering må likevel gjøres på beholdningene her
+        for at senere beholdningsendringer skal bli riktige.
+    Beholdning:
+      type: object
+      description: >
+        Beholdning på tvers av alle ordninger (totalbeholdning for medlemmet
+        opptjent fra stilling og uførepensjon på tvers av stat og kommune).
+        
+        Dette feltet populeres kun i resultatet dersom part `rest` oppgis som
+        query-param til endepunktet (for restbeholdning, pensjonsbeholdning
+        populeres alltid i resultatet).
+      required:
+        - beholdning
+      properties:
+        beholdning:
+          type: integer
+          example: 990100
+          description: Totalbeholdning for medlemmet.
+        endring:
+          type: integer
+          example: 3090
+          description: >
+            Beholdningsendringen fra forrige dato.
+            
+            I tillegg til beholdningen, beskrives selve endringen i beholdning
+            siden forrige dato, som for tilførsler er tilførselsbeløpet, for
+            regulering er beløpet beholdningen oppreguleres med (beholdning
+            ganger sats), for uttak er beløpet avsatt til uttak (restbeholdning
+            ganger uttaksgrad), og for tilbakeføringer er beholdningen justert
+            for uttaket (pensjonsbeholdning ganger delingstall for tilbakefør-
+            ingen delt på delingstall for uttaket).
+            
+            Dette feltet populeres kun i resultatet dersom part `endr` oppgis
+            som query-param til endepunktet.
+        ordninger:
+          type: array
+          items:
+            $ref: '#/components/schemas/Ordningsbeholdning'
+    Ordningsbeholdning:
+      type: object
+      description: >
+        Delbeholdning per ordning, slik den summeres for alle tilførsler som
+        oppgis med denne ordningen i metadata.
+        
+        Ordningsbeholdningen brytes ned til delbeholdninger per avtale for sti-
+        lling og uføre i ordninger som forvaltes av SPK, og samlet per refusjon
+        for andre ordninger (aord), dersom tilførsler oppgis med metadata for
+        dette. Det skilles på beholdning fra stilling og uføre, selv om disse
+        har samme avtalenummer.
+        
+        Tilførsler uten metadata tilfaller den uspesifiserte delbeholdningen.
+        
+        Dette feltes populeres kun i resultatet dersom part `ord` oppgis som
+        query-param til endepunktet.
+      required:
+        - ordningsnummer
+        - beholdning
+      properties:
+        ordningsnummer:
+          type: string
+          pattern: '^\d$'
+          example: '3010'
+          description: Ordningsnummeret for denne ordningen.
+        beholdning:
+          type: integer
+          minimum: 1
+          example: 990100
+          description: Delbeholdningen for denne ordningen.
+        endring:
+          type: integer
+          minimum: 1
+          example: 3090
+          description: >
+            Beholdningsendringen fra forrige dato for denne ordningen.
+            
+            Dette feltes populeres kun i resultatet dersom part `endr` oppgis
+            som query-param til endepunktet.
+        stilling:
+          $ref: '#/components/schemas/Stillingsbeholdning'
+        uføre:
+          $ref: '#/components/schemas/Uførebeholdning'
+        aord:
+          $ref: '#/components/schemas/AordBeholdning'
+        uspesifisert:
+          $ref: '#/components/schemas/UspesifisertBeholdning'
+    Stillingsbeholdning:
+      type: object
+      description: >
+        Delbeholdning fra stilling, slik den summeres for alle tilførsler som
+        oppgis med stilling i metadata.
+        
+        Dette feltes populeres kun i resultatet dersom part `sti` oppgis som
+        query-param til endepunktet.
+      required:
+        - beholdning
+      properties:
+        beholdning:
+          type: integer
+          minimum: 1
+          example: 990100
+          description: Delbeholdningen fra stilling.
+        endring:
+          type: integer
+          minimum: 1
+          example: 3090
+          description: >
+            Beholdningsendringen fra forrige dato for stilling.
+            
+            Dette feltes populeres kun i resultatet dersom part `endr` oppgis
+            som query-param til endepunktet.
+        avtaler:
+          type: array
+          items:
+            $ref: '#/components/schemas/Avtalebeholdning'
+    Uførebeholdning:
+      type: object
+      description: >
+        Delbeholdning fra uføre, slik den summeres for alle tilførsler som
+        oppgis med uføre i metadata.
+        
+        Dette feltes populeres kun i resultatet dersom part `ufo` oppgis som
+        query-param til endepunktet.
+      required:
+        - beholdning
+      properties:
+        beholdning:
+          type: integer
+          minimum: 1
+          example: 990100
+          description: Delbeholdningen fra uføre.
+        endring:
+          type: integer
+          minimum: 1
+          example: 3090
+          description: >
+            Beholdningsendringen fra forrige dato for uføre.
+            
+            Dette feltes populeres kun i resultatet dersom part `endr` oppgis
+            som query-param til endepunktet.
+        avtaler:
+          type: array
+          items:
+            $ref: '#/components/schemas/Avtalebeholdning'
+    Avtalebeholdning:
+      type: object
+      description: >
+        Delbeholdning per avtale knyttet til stilling eller uføre, slik den
+        summeres for alle tilførsler som oppgis med denne avtalen i metadata.
+        
+        Dette feltes populeres kun i resultatet dersom part `avt` oppgis som
+        query-param til endepunktet.
+      required:
+        - avtalenummer
+        - beholdning
+      properties:
+        avtalenummer:
+          type: string
+          minLength: 1
+          example: '201350'
+          description: Avtalenummeret for denne avtalen.
+        beholdning:
+          type: integer
+          minimum: 1
+          example: 990100
+          description: Delbeholdningen for denne avtalen.
+        endring:
+          type: integer
+          minimum: 1
+          example: 3090
+          description: >
+            Beholdningsendringen fra forrige dato for denne avtalen.
+            
+            Dette feltes populeres kun i resultatet dersom part `endr` oppgis
+            som query-param til endepunktet.
+    AordBeholdning:
+      type: object
+      description: >
+        Delbeholdning fra annen ordning (aord), slik den summeres for alle
+        tilførsler som oppgis med annen ordning i metadata.
+        
+        Dette feltes populeres kun i resultatet dersom part `aord` oppgis som
+        query-param til endepunktet.
+      required:
+        - beholdning
+      properties:
+        beholdning:
+          type: integer
+          minimum: 1
+          example: 990100
+          description: Delbeholdningen fra annen ordning.
+        endring:
+          type: integer
+          minimum: 1
+          example: 3090
+          description: >
+            Beholdningsendringen fra forrige dato for annen ordning.
+            
+            Dette feltes populeres kun i resultatet dersom part `endr` oppgis
+            som query-param til endepunktet.
+        refusjoner:
+          type: array
+          items:
+            $ref: '#/components/schemas/Refusjonsbeholdning'
+    Refusjonsbeholdning:
+      type: object
+      description: >
+        Delbeholdning per refusjon knyttet til annen ordning, slik den summeres
+        for alle tilførsler som oppgis med denne refusjonen i metadata.
+        
+        Dette feltes populeres kun i resultatet dersom part `ref` oppgis som
+        query-param til endepunktet.
+      required:
+        - refusjonsnummer
+        - beholdning
+      properties:
+        refusjonsnummer:
+          type: string
+          minLength: 1
+          example: '1000001801452001'
+          description: Refusjonsnummeret for denne refusjonen.
+        beholdning:
+          type: integer
+          minimum: 1
+          example: 990100
+          description: Delbeholdningen for denne refusjonen.
+        endring:
+          type: integer
+          minimum: 1
+          example: 3090
+          description: >
+            Beholdningsendringen fra forrige dato for denne refusjonen.
+            
+            Dette feltes populeres kun i resultatet dersom part `endr` oppgis
+            som query-param til endepunktet.
+    UspesifisertBeholdning:
+      type: object
+      description: >
+        Delbeholdning som hverken er knyttet til en gitt avtale eller refusjon,
+        slik den summeres for alle tilførsler som oppgis uten metadata.
+        
+        Dette feltes populeres kun i resultatet dersom part `uspes` oppgis som
+        query-param til endepunktet.
+      required:
+        - beholdning
+      properties:
+        beholdning:
+          type: integer
+          minimum: 1
+          example: 990100
+          description: Den uspesifiserte delbeholdningen.
+        endring:
+          type: integer
+          minimum: 1
+          example: 3090
+          description: >
+            Beholdningsendringen fra forrige dato.
+            
+            Dette feltes populeres kun i resultatet dersom part `endr` oppgis
+            som query-param til endepunktet.
+    BeholdningsendringMeta:
+      type: object
+      description: >
+        Metadata knyttet til beregning av beholdningsendringen, slikt som
+        detaljer rundt uttaket eller om tilførselen.
+        
+        Uttaksgivende beholdningsendringer av typen gradsendring og tilvekst
+        inkluderer detaljer om uttaket i feltet `uttak`, og beholdningsendringer
+        av typen tilførsel inkluderer detaljer om denne i feltet `tilførsel`.
+      properties:
+        uttak:
+          $ref: '#/components/schemas/UttakMeta'
+        tilførsel:
+          $ref: '#/components/schemas/TilførselMeta'
+    UttakMeta:
+      type: object
+      description: >
+        Metadata knyttet til en uttaksgivende beholdningsendring.
+        
+        Uttaksgrad reflekterer den til enhver tid gjeldende uttaksgraden gitt
+        gradsendringene som sendes inn, og oppgis kun for uttakssgivende behold-
+        ningsendringer (se under). Pensjonsbeholdningen er alltid ferdig gradert
+        med uttaksgraden. Restbeholdningen er alltid ferdig avkortet med uttaks-
+        graden.
+        
+        Dette feltes populeres kun i resultatet dersom part `umeta` oppgis
+        som query-param til endepunktet.
+      required:
+        - uttaksgrad
+        - delingstall
+      properties:
+        uttaksgrad:
+          $ref: '#/components/schemas/Uttaksgrad'
+        delingstall:
+          type: number
+          format: double
+          minimum: 0.0
+          example: 13.92
+          description: >
+            Gjeldende delingstall på tidspunktet for beholdningsendringen.
+            
+            Delingstall oppgis kun for uttakssgivende beholdningsendringer. Pen-
+            sjonsbeholdningen delt på delingstallet gir den årlige pensjonen.
+    TilførselMeta:
+      type: object
+      description: >
+        Metadata knyttet til beregning av tilførselen, slikt som detaljer rundt
+        enten stillingen eller uførepensjonen som ligger til grunn for tilførs-
+        elen, og ordningen tilførselen stammer fra.
+        
+        Dette feltes populeres kun i resultatet dersom part `tmeta` oppgis som
+        query-param til endepunktet.
+      properties:
+        ordningsnummer:
+          type: string
+          pattern: '^\d$'
+          example: '3010'
+          description: Ordningsnummeret tilførselen stammer fra.
+        kilde:
+          $ref: '#/components/schemas/Opptjeningskilde'
+        stilling:
+          $ref: '#/components/schemas/StillingMeta'
+        uføre:
+          $ref: '#/components/schemas/UføreMeta'
+        aord:
+          $ref: '#/components/schemas/AordMeta'
+    Opptjeningskilde:
+      type: string
+      enum:
+        - Stilling
+        - Uføre
+        - Aord
+        - Uspesifisert
+      description: >
+        Kilden til opptjening tilførselen stammer fra.
+        
+        Tilførsler beregnes enten fra stilling eller uføre, eller som refusjon
+        fra annen ordning (aord) i overføringsavtalen (OFA), men ettersom kilden
+        ikke nødvendigvis må oppgis for å beregne beholdningsendringer, kan
+        denne også være uspesifisert.
+    StillingMeta:
+      type: object
+      description: >
+        Metadata knyttet til stillingen tilførselen ble beregnet fra, slikt som
+        stillingsprosent og årslønn, samt sats som ble brukt til beregning av
+        disse.
+      required:
+        - forholdsnummer
+        - avtalenummer
+        - stillingsprosent
+        - lønn
+        - sats
+      properties:
+        forholdsnummer:
+          type: string
+          minLength: 1
+          example: '1269167'
+        avtalenummer:
+          type: string
+          minLength: 1
+          example: '201350'
+        stillingsprosent:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 100.0
+          example: 80.0
+        lønn:
+          type: integer
+          minimum: 1
+          example: 609000
+        sats:
+          type: number
+          format: double
+          minimum: 0.0
+          example: 5.7
+    UføreMeta:
+      type: object
+      description: >
+        Metadata knyttet til uførepensjonen tilførselen ble beregnet fra, slikt
+        som uføregrad og pensjonsgrunnlag, samt sats som ble brukt til beregning
+        av disse.
+      required:
+        - avtalenummer
+        - uføregrad
+        - pensjonsgrunnlag
+        - sats
+      properties:
+        avtalenummer:
+          type: string
+          minLength: 1
+          example: '201350'
+        uføregrad:
+          type: integer
+          minimum: 0
+          example: 100
+        pensjonsgrunnlag:
+          type: integer
+          minimum: 1
+          example: 609000
+        sats:
+          type: number
+          format: double
+          minimum: 0.0
+          example: 5.7
+    AordMeta:
+      type: object
+      description: >
+        Metadata knyttet til stilling eller uføre hos annen ordning (aord),
+        slikt som refusjonsnummer (også kjent som refusjonId) hos den andre
+        ordningen.
+      properties:
+        refusjonsnummer:
+          type: string
+          minLength: 1
+          example: '1000001801452001'
+    Beregningsmelding:
+      type: object
+      description: >
+        Beregningsmelding kan tolkes for å gi tilbakemelding til en saksbehan-
+        dler, medlemmet, eller handles på for å stoppe en automatisk pensjons-
+        behandling, avhengig av hvilket system som kaller tjenesten.
+        
+        Beregningsmelding ble tidligere omtalt som feil og varsler, men endret
+        navn slik at det ikke skulle forvirres med tekniske feil fra tjenesten.
+      required:
+        - kode
+      properties:
+        kode:
+          type: integer
+          minimum: 0
+          example: 1952
+          description: >
+            Kode som unikt identifiserer beregningsmeldingen.
+            
+            Hvilke koder som eksisterer bestemmes i de underliggende tjenestene
+            og kan utvikle seg uavhengig av denne tjenesten.
+        grad:
+          $ref: '#/components/schemas/Alvorlighetsgrad'
+        melding:
+          type: string
+          minLength: 1
+          example: 'Det oppgis andre ordninger med både startbeholdning og tilførsler'
+          description: Melding som kan vises til saksbehandler eller medlem.
+    Alvorlighetsgrad:
+      type: string
+      enum:
+        - Kritisk
+        - Varsel
+      example: Kritisk
+      description: >
+        Alvorlighetsgraden til beregningsmeldingen.
+        
+        Kritisk betyr at beregningen ikke kan eller bør utføres, og bør føre til
+        at pensjonen ikke skal beregnes. Manuell korrigering av beregningsgrunn-
+        laget av saksbehandler er sannsynligvis nødvendig.
+        
+        Varsel betyr at beregningen kan utføres, men er unøyaktig eller har
+        kjente mangler som ikke nødvendigvis må rettes for at pensjonen skal
+        beregnes. Varsler bør vises til saksbehandler eller medlem for å gjøre
+        dem oppmerksomme på dette.

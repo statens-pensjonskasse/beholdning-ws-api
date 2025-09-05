@@ -1,0 +1,22 @@
+{
+  "version": "5.0.1",
+  "name": "@spk/beholdning-ws-api-ts-client",
+  "types": "dist/index.d.js",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "npm run generate && tsc",
+    "generate": "rm -rf build && openapi-generator-cli generate -i ../target/classes/openapi/openapi.yaml -o build -g typescript-fetch --additional-properties=supportsES6=true,npmVersion=6.9.0,typescriptThreePlus=true,allowUnicodeIdentifiers=true --type-mappings=string+date=string",
+    "tsc": "tsc"
+  },
+  "always-auth": true,
+  "user": "sa-npm",
+  "publishConfig": {
+    "registry": "https://nexus.spk.no/content/repositories/spk-npm/"
+  },
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.5.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}

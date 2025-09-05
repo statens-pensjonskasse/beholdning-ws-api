@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/api/beholdning/beregn",
+    "headers": {
+      "Accept": {
+        "contains": "application/vnd.spk.v5+json"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/vnd.spk.v5+json"
+    },
+    "bodyFileName": "beregn-beholdning-v5-response.json"
+  }
+}

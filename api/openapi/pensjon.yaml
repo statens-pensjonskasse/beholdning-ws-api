@@ -1,0 +1,198 @@
+components:
+  schemas:
+    Pensjon:
+      type: object
+      required:
+        - fraOgMed
+        - ordningsnummer
+        - pensjonstype
+        - produkt
+        - uttak
+      properties:
+        fraOgMed:
+          type: string
+          format: date
+          example: '2025-03-01'
+        tilOgMed:
+          type: string
+          format: date
+          example: '2025-03-31'
+        ordningsnummer:
+          type: string
+          pattern: '^\d+$'
+          example: '3010'
+        pensjonstype:
+          $ref: '#/components/schemas/Pensjonstype'
+        produkt:
+          $ref: '#/components/schemas/Pensjonsprodukt'
+        uttak:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pensjonsuttak'
+    Pensjonstype:
+      type: string
+      enum:
+        - Utbetaling
+      description: >
+        Pensjonstype er kun relevant for denne pensjonstypen. Beregnet pensjon
+        med andre pensjonstyper skal ikke sendes inn.
+        
+        Hvorfor oppgi pensjonstype når det kun finnes én, spør du? Fordi da
+        leser du denne dokumentasjonen og finner ut at du skal filtrere bort
+        andre typer framfor å mappe alle pensjonstyper til denne ene. ;-)
+    Pensjonsprodukt:
+      type: string
+      enum:
+        - Alderspensjon
+        - Uførepensjon
+        - Etterlattepensjon
+        - Avtalefestetpensjon
+        - Særalderpensjon
+        - Påslagspensjon
+        - BetingetTjenestepensjon
+        - OppsattBrutto
+        - Overgangstillegg
+        - LivsvarigAfp
+      example: Alderspensjon
+    Pensjonsuttak:
+      type: object
+      required:
+        - fraOgMed
+        - gjennomsnittligStillingsprosent
+        - grunnlag
+      properties:
+        fraOgMed:
+          type: string
+          format: date
+          example: '2025-03-01'
+        tilOgMed:
+          type: string
+          format: date
+          example: '2025-03-31'
+        avtalenummer:
+          type: string
+          pattern: '^\d+$'
+          example: '254760'
+        gjennomsnittligStillingsprosent:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 200.0
+          example: 80.0
+        grunnlag:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pensjonsgrunnlag'
+    Pensjonsgrunnlag:
+      type: object
+      required:
+        - fraOgMed
+        - grunnlagsgrad
+        - pensjonsgrunnlag
+        - beregnedePensjoner
+      properties:
+        fraOgMed:
+          type: string
+          format: date
+          example: '2025-03-01'
+        tilOgMed:
+          type: string
+          format: date
+          example: '2025-03-31'
+        grunnlagsgrad:
+          type: number
+          format: double
+          minimum: 0.0
+          maximum: 100.0
+          example: 60.0
+        pensjonsgrunnlag:
+          type: integer
+          minimum: 1
+          example: 600000
+        uføregrad:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 40
+        beregnedePensjoner:
+          type: array
+          items:
+            $ref: '#/components/schemas/BeregnetPensjon'
+    BeregnetPensjon:
+      type: object
+      required:
+        - fraOgMed
+        - beregningstype
+        - pensjonsart
+        - pensjonsgrad
+        - nullberegningUføre80ProsentRegel
+        - redusertPensjon
+      properties:
+        fraOgMed:
+          type: string
+          format: date
+          example: '2025-03-01'
+        tilOgMed:
+          type: string
+          format: date
+          example: '2025-03-31'
+        pensjonsart:
+          $ref: '#/components/schemas/Pensjonsart'
+        beregningstype:
+          $ref: '#/components/schemas/Beregningstype'
+        pensjonsgrad:
+          type: integer
+          minimum: 0
+          maximum: 100
+          example: 100
+        nullberegningUføre80ProsentRegel:
+          type: boolean
+          example: true
+        redusertPensjon:
+          type: integer
+          minimum: 0
+          example: 20000
+    Pensjonsart:
+      type: string
+      enum:
+        - '305' # VarigUføre
+        - '306' # VarigUføreSkalOmregnes
+        - '316' # KombinertOppsattOgStraksløpendeUføre
+        - '325' # OppsattUføreMedlemFør1967
+        - '326' # OppsattUføreMedlemEtter1967
+        - '343' # RefusjonspensjonUføre
+        - '344' # MedregningspensjonUføre
+        - '355' # MidlertidigUføreMedLegeerklæring
+        - '356' # MidlertidigUføreUtenLegeerklæring
+        - '365' # VarigUførePgaUlykke
+        - '375' # MidlertidigUførePgaUlykkeMedLegeerklæring
+        - '376' # MidlertidigUførePgaUlykkeUtenLegeerklæring
+      x-enum-varnames:
+        - VarigUføre                                 # 305
+        - VarigUføreSkalOmregnes                     # 306
+        - KombinertOppsattOgStraksløpendeUføre       # 316
+        - OppsattUføreMedlemFør1967                  # 325
+        - OppsattUføreMedlemEtter1967                # 326
+        - RefusjonspensjonUføre                      # 343
+        - MedregningspensjonUføre                    # 344
+        - MidlertidigUføreMedLegeerklæring           # 355
+        - MidlertidigUføreUtenLegeerklæring          # 356
+        - VarigUførePgaUlykke                        # 365
+        - MidlertidigUførePgaUlykkeMedLegeerklæring  # 375
+        - MidlertidigUførePgaUlykkeUtenLegeerklæring # 376
+      example: '305'
+      description: >
+        Beregnet pensjon er kun relevant for disse artstypene. Beregnet pensjon
+        med andre pensjonsarter skal ikke sendes inn.
+    Beregningstype:
+      type: string
+      enum:
+        - Pensjon
+      example: Pensjon
+      description: >
+        Beregnet pensjon er kun relevant for denne beregningstypen. Beregnet
+        pensjon med andre beregningstyper skal ikke sendes inn.
+        
+        Hvorfor oppgi beregningstype når det kun finnes én, spør du? Fordi da
+        leser du denne dokumentasjonen og finner ut at du skal filtrere bort
+        andre typer framfor å mappe alle beregningstyper til denne ene. ;-)
